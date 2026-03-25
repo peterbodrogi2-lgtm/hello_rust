@@ -17,4 +17,20 @@ fn main() {
 let mut voltage: f64 = 34.0000;
 let mut is_on: bool = false;
 println!("led_count = {}, voltage = {}, is_on = {}", led_count, voltage, is_on);
+
+fn add(x: f32, y: f32) -> f32 {
+    x + y
+}
+fn subtract(x: f32, y: f32) -> f32 {
+    x - y    
+}
+
+let a = 3.000;
+let b = 7.000;
+let sum = add(a, b);
+let nyu = subtract(a, b);
+    println!("{} + {} = {}", a, b, sum);
+    println!("{} + {} = {}", a, b, nyu);
+    
+
 }
