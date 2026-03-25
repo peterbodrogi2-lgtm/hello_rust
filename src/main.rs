@@ -25,12 +25,17 @@ fn subtract(x: f32, y: f32) -> f32 {
     x - y    
 }
 
+/// Prints a greeting with the given name.
+fn greet(name: &str) {
+    println!("Hello, {}, You are a Rabbit!", name);
+}
+
 let a = 3.000;
 let b = 7.000;
 let sum = add(a, b);
 let nyu = subtract(a, b);
     println!("{} + {} = {}", a, b, sum);
     println!("{} + {} = {}", a, b, nyu);
-    
+greet("Peter")    
 
 }
