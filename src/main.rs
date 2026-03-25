@@ -14,3 +14,7 @@ fn main() {
     let pi: f64 = 3.1415926535897932384626;
     println!("pi = {}", pi);
 }
+let mut led_count = 6;
+let mut voltage = 34;
+let mut is_on = F;
+println!("led_count = {}, voltage = {}, is_on = {}", led_count, voltage, is_on);
