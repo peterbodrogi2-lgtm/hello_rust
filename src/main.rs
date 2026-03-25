@@ -36,6 +36,6 @@ let sum = add(a, b);
 let nyu = subtract(a, b);
     println!("{} + {} = {}", a, b, sum);
     println!("{} + {} = {}", a, b, nyu);
-greet("Peter")    
+greet("Peter (Osterhase)")    
 
 }
