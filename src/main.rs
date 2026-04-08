@@ -1,41 +1,35 @@
-fn main() {
-    // Immutable variable (cannot change)
-    let x = 5;
-    println!("x = {}", x);
+use argmin::core::{CostFunction, Error, Executor, State};
+use argmin::solver::goldensectionsearch::GoldenSectionSearch;
 
-    // Mutable variable (can change)
-    let mut counter = 0;
-    println!("counter (start) = {}", counter);
+struct MyFunc;
 
-    counter = counter + 1;
-    println!("counter (after +1) = {}", counter);
+impl CostFunction for MyFunc {
+    type Param = f64;
+    type Output = f64;
 
-    // With explicit type annotation
-    let pi: f64 = 3.1415926535897932384626;
-    println!("pi = {}", pi);
-    let mut led_count: f64 = 6.000;
-let mut voltage: f64 = 34.0000;
-let mut is_on: bool = false;
-println!("led_count = {}, voltage = {}, is_on = {}", led_count, voltage, is_on);
-
-fn add(x: f32, y: f32) -> f32 {
-    x + y
-}
-fn subtract(x: f32, y: f32) -> f32 {
-    x - y    
+    fn cost(&self, x: &f64) -> Result<f64, Error> {
+        Ok((x - 2.0).powi(2) + 1.0)
+    }
 }
 
-/// Prints a greeting with the given name.
-fn greet(name: &str) {
-    println!("Hello, {}, You are a Rabbit!", name);
-}
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let problem = MyFunc;
 
-let a = 3.000;
-let b = 7.000;
-let sum = add(a, b);
-let nyu = subtract(a, b);
-    println!("{} + {} = {}", a, b, sum);
-    println!("{} + {} = {}", a, b, nyu);
-greet("Peter (Osterhase)")    
+    let solver = GoldenSectionSearch::new(0.0_f64, 5.0_f64)?
+        .with_tolerance(1e-8)?;
 
+    let init = 2.5_f64;
+
+    let result = Executor::new(problem, solver)
+        .configure(|state| state.param(init).max_iters(100))
+        .run()?;
+
+    let state = result.state();
+    let x_min = state.get_best_param().expect("no parameter returned");
+    let f_min = state.get_best_cost();
+
+    println!("x_min = {}", x_min);
+    println!("f(x_min) = {}", f_min);
+
+    Ok(())
 }
