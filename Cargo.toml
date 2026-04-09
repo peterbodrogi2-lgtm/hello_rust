@@ -1,7 +1,33 @@
 [package]
-name = "bounded_minimize"
+name    = "optec-thermal-api"
 version = "0.1.0"
 edition = "2021"
 
+[[bin]]
+name = "optec-thermal-api"
+path = "src/main.rs"
+
 [dependencies]
-argmin = "0.10"
+# ── HTTP / async ──────────────────────────────────────────────────────────────
+axum    = "0.8"                          # REST framework (Tokio team)
+tokio   = { version = "1", features = ["full"] }
+
+# ── Serialisation ─────────────────────────────────────────────────────────────
+serde       = { version = "1", features = ["derive"] }
+serde_json  = "1"
+
+# ── CSV parsing ───────────────────────────────────────────────────────────────
+csv         = "1"                        # BurntSushi's csv crate (fast, well-tested)
+
+# ── Error handling ────────────────────────────────────────────────────────────
+anyhow      = "1"
+
+# ── Logging / tracing ─────────────────────────────────────────────────────────
+tracing             = "0.1"
+tracing-subscriber  = { version = "0.3", features = ["env-filter"] }
+
+[profile.release]
+opt-level   = 3
+lto         = true          # link-time optimisation — smaller, faster binary
+codegen-units = 1           # single codegen unit for maximum optimisation
+strip       = true          # strip debug symbols → smaller Docker image
