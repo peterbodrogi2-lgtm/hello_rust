@@ -30,25 +30,30 @@ impl Lut2D {
     /// Load a headerless comma-separated CSV.
     /// Each row is one I-value; each column is one Ts-value.
     fn load(path: &str, n_i: usize, n_ts: usize,
-            i_min: f64, i_step: f64,
-            ts_min: f64, ts_step: f64) -> anyhow::Result<Self> {
-        let mut rdr = ReaderBuilder::new()
-            .has_headers(false)
-            .from_path(path)?;
-        let mut data = Vec::with_capacity(n_i * n_ts);
-        for rec in rdr.records() {
-            for field in rec?.iter() {
-                data.push(field.trim().parse::<f64>()
-                    .map_err(|e| anyhow::anyhow!("parse error in {path}: {e}"))?);
-            }
+        i_min: f64, i_step: f64,
+        ts_min: f64, ts_step: f64) -> anyhow::Result<Self> {
+    let mut rdr = ReaderBuilder::new()
+        .has_headers(true)   // ← consumes the 61-field Ts header row, discards it
+        .flexible(true)      // ← allows data rows (62 fields) to differ from header (61 fields)
+        .from_path(path)?;
+
+    let mut data = Vec::with_capacity(n_i * n_ts);
+    for rec in rdr.records() {
+        let rec = rec?;
+        // rec[0] is the R row-name (I value as string: "0","1",…,"2000") → skip it
+        // rec[1..=61] are the 61 flux/power values for Ts = 25…85
+        for field in rec.iter().skip(1).take(n_ts) {
+            data.push(field.trim().parse::<f64>()
+                .map_err(|e| anyhow::anyhow!("parse error in {path}: {e}"))?);
         }
-        anyhow::ensure!(
-            data.len() == n_i * n_ts,
-            "LUT '{path}': expected {} values, got {}",
-            n_i * n_ts, data.len()
-        );
-        Ok(Lut2D { n_i, n_ts, i_min, i_step, ts_min, ts_step, data })
     }
+    anyhow::ensure!(
+        data.len() == n_i * n_ts,
+        "LUT '{path}': expected {} values, got {}",
+        n_i * n_ts, data.len()
+    );
+    Ok(Lut2D { n_i, n_ts, i_min, i_step, ts_min, ts_step, data })
+}
 
     /// Bilinear interpolation; inputs are clamped to the grid boundary.
     /// Equivalent to R's itp2df().
